@@ -1,3 +1,1 @@
-/* global window */
-
-module.exports = window.ts;
+module.exports = globalThis.ts;

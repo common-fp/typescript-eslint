@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../typescript-eslint"
+    },
+    {
       "path": "../visitor-keys"
     },
     {

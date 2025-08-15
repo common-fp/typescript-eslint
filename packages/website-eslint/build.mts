@@ -43,7 +43,7 @@ async function buildPackage(name: string, file: string): Promise<void> {
   const linterPath = path.join(eslintRoot, '../lib/linter/linter.js');
   const rulesPath = path.join(eslintRoot, '../lib/rules/index.js');
 
-  await esbuild.build({
+  const result = await esbuild.build({
     alias: Object.fromEntries(
       [
         // built-in Node packages — alias each twice — both with and without the `node:` prefix
@@ -59,10 +59,6 @@ async function buildPackage(name: string, file: string): Promise<void> {
         ),
       ]),
     ),
-    banner: {
-      // https://github.com/evanw/esbuild/issues/819
-      js: `define(['exports', 'vs/language/typescript/tsWorker'], function (exports) {`,
-    },
     bundle: true,
     define: {
       'define.amd': 'false',
@@ -79,12 +75,9 @@ async function buildPackage(name: string, file: string): Promise<void> {
       [name]: requireResolved(file),
     },
     external: [],
-    footer: {
-      // https://github.com/evanw/esbuild/issues/819
-      js: `});`,
-    },
-    format: 'cjs',
-    minify: true,
+    format: 'esm',
+    metafile: true,
+    minify: false,
     outdir: './dist/',
     platform: 'browser',
     plugins: [
@@ -162,12 +155,14 @@ async function buildPackage(name: string, file: string): Promise<void> {
         },
       },
     ],
-    sourcemap: 'linked',
+    sourcemap: false,
     supported: {},
     target: 'es2020',
     treeShaking: true,
     write: true,
   });
+
+  await fs.writeFile('./dist/meta.json', JSON.stringify(result.metafile));
 }
 
 console.time('building eslint for web');
