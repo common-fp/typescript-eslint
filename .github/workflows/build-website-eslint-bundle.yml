@@ -1,0 +1,28 @@
+name: Release website-eslint bundle
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-[0-9A-Za-z]+'
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.6.0
+      - run: npm i -g corepack@0.34.0
+      - run: yarn
+      - run: yarn build
+      - working-directory: ./packages/website-eslint
+        run: yarn build
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./packages/website-eslint/dist/index.js
+            ./packages/website-eslint/dist/meta.json
